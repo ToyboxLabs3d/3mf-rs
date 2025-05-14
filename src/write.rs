@@ -16,13 +16,16 @@ use crate::model::Model;
 pub fn write<W: Write + io::Seek, M: Into<Model>>(writer: W, model: M) -> Result<(), Error> {
     let mut archive = ZipWriter::new(writer);
 
-    archive.start_file("[Content_Types].xml", SimpleFileOptions::default())?;
+    let file_options =
+        SimpleFileOptions::default().compression_method(zip::CompressionMethod::Stored);
+
+    archive.start_file("[Content_Types].xml", file_options)?;
     archive.write_all(include_bytes!("content-types.xml"))?;
 
-    archive.start_file("_rels/.rels", SimpleFileOptions::default())?;
+    archive.start_file("_rels/.rels", file_options)?;
     archive.write_all(include_bytes!("rels.xml"))?;
 
-    archive.start_file("3D/model.model", SimpleFileOptions::default())?;
+    archive.start_file("3D/model.model", file_options)?;
 
     let mut xml = String::new();
 
